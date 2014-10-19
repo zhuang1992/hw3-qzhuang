@@ -71,8 +71,5 @@ public class VectorSpaceRetrieval {
 		
 		double totalTime=(endTime-startTime)/1000.0;
 		System.out.println("Total time taken: "+totalTime);
-		
-
 	}
-
 }

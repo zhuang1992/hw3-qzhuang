@@ -8,7 +8,9 @@ import org.apache.uima.jcas.JCas;
 
 import edu.cmu.lti.f14.hw3.hw3_qzhuang.typesystems.Document;
 
-
+/**
+ *  Identify the query id and relevant scores, and store them in the CAS. 
+ **/
 public class DocumentReader 
 extends JCasAnnotator_ImplBase  {
 	
@@ -18,7 +20,6 @@ extends JCasAnnotator_ImplBase  {
 		
 		// reading sentence from the CAS 
 		String sLine = jcas.getDocumentText();
-
 		// TODO: make sure information from text collection are extracted correctly
 		ArrayList<String> docInfo = parseDataLine(sLine);
 		
