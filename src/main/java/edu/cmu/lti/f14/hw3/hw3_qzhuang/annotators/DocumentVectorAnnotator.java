@@ -12,18 +12,19 @@ import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.FSIterator;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.cas.FSList;
+import org.apache.uima.jcas.cas.IntegerArray;
+import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.tcas.Annotation;
 
 import edu.cmu.lti.f14.hw3.hw3_qzhuang.typesystems.*;
-import edu.cmu.lti.f14.hw3.hw3_qzhuang.utils.MyLemmatizer;
-import edu.cmu.lti.f14.hw3.hw3_qzhuang.utils.OpenNLPTokenization;
-import edu.cmu.lti.f14.hw3.hw3_qzhuang.utils.RemoveStopWords;
 import edu.cmu.lti.f14.hw3.hw3_qzhuang.utils.Utils;
 /**
  * Identify the word and word frequency in each sentence. 
  * Store the word vector in the Document Type.
  **/
+
 public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
 
   @Override
@@ -35,6 +36,7 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
       Document doc = (Document) iter.get();
       createTermFreqVector(jcas, doc);
     }
+
   }
 
   /**
@@ -52,8 +54,9 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
     return res;
   }
   
+  
   /**
-   * 
+   * Construct a vector of tokens and update the tokenList in CAS
    * @param jcas
    * @param doc
    */
@@ -62,17 +65,9 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
 
     String docText = doc.getText();
     // TO DO: construct a vector of tokens and update the tokenList in CAS
-    MyLemmatizer lemma = MyLemmatizer.getInstance();
-    String newStr = lemma.lemmatize(docText);
-    //System.out.println("newStr:"+newStr);
-    OpenNLPTokenization tokenize = OpenNLPTokenization.getInstance();
-    List<String> words = tokenize.tokenize(newStr);
-    //List<String>words = lemma.lemmatize(docText);
+    List<String> words = tokenize0(docText);
     Map<String, Integer> count = new HashMap<String, Integer>();
     for (String s : words) {
-      RemoveStopWords checker = RemoveStopWords.getInstance();
-      if(checker.checkExistance(s))
-        continue;
       if (count.containsKey(s)) {
         count.put(s, count.get(s) + 1);
       } else {
@@ -83,13 +78,11 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
     Collection<Token> tokenSet = new HashSet<Token>();
     while (iter.hasNext()) {
       String tokenText = iter.next();
-      System.out.println("token:"+tokenText);
       Token newToken = new Token(jcas);
       newToken.setText(tokenText);
       newToken.setFrequency(count.get(tokenText));
       tokenSet.add(newToken);
     }
-    System.out.println("\n");
     FSList docTokens = Utils.fromCollectionToFSList(jcas, tokenSet);
     doc.removeFromIndexes(jcas);
     doc.setTokenList(docTokens);
